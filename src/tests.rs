@@ -103,6 +103,21 @@ Text {
 }
 "#;
         assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
+        let input = r#"
+Service(
+Ser(
+Serr()
+)
+)
+"#;
+        let expected_output = r#"
+Service(
+    Ser(
+        Serr()
+    )
+)
+"#;
+        assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
     }
 
     #[test]
@@ -149,6 +164,7 @@ Text {}
             "12_if_else_mismatch",
             "13_if_oneliner",
             "14_different_quotes",
+            "15_square_bracket",
             "example",
         ];
         for test_name in tests {

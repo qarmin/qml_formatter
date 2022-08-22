@@ -50,7 +50,7 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(line.clone());
         } else {
             let mut new_line = "".to_string();
-            let spaces_to_add = if line.trim().starts_with("}") {
+            let spaces_to_add = if line.trim().starts_with("}") || line.trim().starts_with(")") {
                 current_bracket_number - 1
             } else {
                 current_bracket_number
@@ -62,14 +62,31 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(new_line.trim_end().to_string()); // Trimming, because empty line with only spaces could be here
         }
 
-        if line.contains('{') {
-            current_bracket_number += 1;
+        let mut count_open_round_bracket = 0;
+        let mut count_open_bracket = 0;
+        let mut count_close_round_bracket = 0;
+        let mut count_close_bracket = 0;
+        for charr in line.chars() {
+            if charr == '{' {
+                count_open_bracket += 1;
+            } else if charr == '}' {
+                count_close_bracket += 1;
+            } else if charr == '(' {
+                count_open_round_bracket += 1;
+            } else if charr == ')' {
+                count_close_round_bracket += 1;
+            }
         }
-        if line.contains('}') {
-            if current_bracket_number == 0 {
+
+        current_bracket_number += count_open_round_bracket + count_open_bracket;
+
+        let calculated_ending_brackets = count_close_bracket + count_close_round_bracket;
+        if calculated_ending_brackets != 0 {
+            if current_bracket_number < calculated_ending_brackets as u32 {
                 println!("Mismatched number of {{ brackets, probably QML is broken");
+                current_bracket_number = 0
             } else {
-                current_bracket_number -= 1;
+                current_bracket_number -= calculated_ending_brackets;
             }
         }
     }
