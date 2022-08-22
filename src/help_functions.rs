@@ -13,9 +13,9 @@ pub fn collect_files_to_check() -> (bool, Vec<String>, Vec<String>) {
             interactive_mode = false
         } else if let Some(directory) = argument.strip_prefix("-e") {
             if Path::new(directory).exists() {
-                excluded_directories.push(argument)
+                excluded_directories.push(directory.to_string())
             } else {
-                eprintln!("Path {} not exists!", argument);
+                eprintln!("Path {} not exists!", directory);
             }
         } else if Path::new(&argument).exists() {
             included_directories.push(argument)
@@ -32,6 +32,7 @@ pub fn collect_files_to_check() -> (bool, Vec<String>, Vec<String>) {
     for dir in included_directories.clone() {
         for entry in WalkDir::new(dir).into_iter().filter_map(|e| e.ok()) {
             let path: &Path = entry.path();
+            let path_canon = path.canonicalize().unwrap();
             if !path.is_file() {
                 continue;
             }
@@ -40,7 +41,7 @@ pub fn collect_files_to_check() -> (bool, Vec<String>, Vec<String>) {
                 continue;
             }
 
-            if excluded_directories.iter().any(|f| path_str.starts_with(f)) {
+            if excluded_directories.iter().any(|f| path_canon.to_string_lossy().to_string().starts_with(f)) {
                 continue; // Excluded item
             };
 

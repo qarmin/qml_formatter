@@ -6,21 +6,24 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
             let chars_to_check: Vec<char> = line.trim_start().chars().collect();
             let mut collected_chars: Vec<char> = Vec::new();
 
-            let mut quote_is_started = false;
+            let mut quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
             for item in chars_to_check {
                 if item == ' ' {
-                    if quote_is_started || collected_chars.last() != Some(&' ') {
+                    if quote_char.is_some() || collected_chars.last() != Some(&' ') {
                         collected_chars.push(' ');
                     }
                 } else if item == ':' {
-                    if !quote_is_started && collected_chars.last() == Some(&' ') {
+                    if quote_char.is_none() && collected_chars.last() == Some(&' ') {
                         collected_chars.pop();
                     }
                     collected_chars.push(item);
-                } else if item == '"' {
-                    // TODO add support for ', because is probably supported
+                } else if item == '"' || item == '\'' || item == '`' {
                     if collected_chars.last() != Some(&'\\') {
-                        quote_is_started = !quote_is_started;
+                        if quote_char.is_none() {
+                            quote_char = Some(item);
+                        } else if Some(item) == quote_char {
+                            quote_char = None;
+                        }
                     }
                     collected_chars.push(item);
                 } else {
@@ -163,12 +166,22 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
 
 pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
+    let mut quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
     for line in lines {
         if line.contains("{") {
             let mut new_line: Vec<char> = Vec::new();
             for charr in line.chars() {
-                if charr == '{' {
-                    if new_line.last() != Some(&' ') && new_line.last() != None {
+                if charr == '"' || charr == '\'' || charr == '`' {
+                    if new_line.last() != Some(&'\\') {
+                        if quote_char.is_none() {
+                            quote_char = Some(charr);
+                        } else if Some(charr) == quote_char {
+                            quote_char = None;
+                        }
+                    }
+                    new_line.push(charr);
+                } else if charr == '{' {
+                    if quote_char.is_none() && new_line.last() != Some(&' ') && new_line.last() != None {
                         new_line.push(' ');
                     }
                     new_line.push(charr);

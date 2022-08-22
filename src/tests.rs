@@ -148,6 +148,7 @@ Text {}
             "11_empty_line_before_ending",
             "12_if_else_mismatch",
             "13_if_oneliner",
+            "14_different_quotes",
             "example",
         ];
         for test_name in tests {
