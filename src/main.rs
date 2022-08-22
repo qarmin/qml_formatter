@@ -9,6 +9,7 @@ fn convert_file(file: String) -> String {
     lines = skip_start_end_empty_lines(lines);
 
     // This functions are safe to think, that any non empty line starts with non empty character
+    lines = move_single_open_bracket(lines);
     lines = remove_useless_spaces_around_colon(lines);
 
     // Always at the end, before lines are guaranteed to start not with whitespace
@@ -102,6 +103,21 @@ fn skip_start_end_empty_lines(mut lines: Vec<String>) -> Vec<String> {
     lines
 }
 
+fn move_single_open_bracket(lines: Vec<String>) -> Vec<String> {
+    let mut collected_lines: Vec<String> = Vec::new();
+    for line in lines {
+        if line == "{" {
+            if let Some(last_line) = collected_lines.last_mut() {
+                last_line.push_str(" {");
+            }
+        } else {
+            collected_lines.push(line);
+        }
+    }
+
+    collected_lines
+}
+
 #[allow(unused)]
 fn split_text_to_vector(text: &str) -> Vec<String> {
     text.split('\n').map(str::to_string).collect()
@@ -111,6 +127,16 @@ fn split_text_to_vector(text: &str) -> Vec<String> {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn test_move_single_open_bracket() {
+        let input = r#"Text
+{
+}"#;
+        let expected_output = r#"Text {
+}"#;
+        assert_eq!(move_single_open_bracket(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
 
     #[test]
     fn test_remove_useless_spaces_around_colon() {
@@ -184,6 +210,7 @@ Text {}
             "6_space_after_colon",
             "7_space_after_colon_in_string",
             "8_space_after_colon_in_string_with_slash",
+            "9_single_open_bracket",
         ];
         for test_name in tests {
             println!("Testing {}", test_name);
