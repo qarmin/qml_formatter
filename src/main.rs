@@ -1,10 +1,55 @@
+mod help_functions;
 mod rules;
 mod tests;
 
+use crate::help_functions::*;
 use crate::rules::*;
 
+use std::fs::OpenOptions;
+use std::io::Read;
+use std::io::Write;
+
+use std::{fs, io, process};
+
 fn main() {
-    convert_file("AB".to_string());
+    let (interactive_mode, included_directories, files_to_check) = collect_files_to_check();
+
+    println!(
+        "{} files from \"{}\" will be checked - {}",
+        files_to_check.len(),
+        included_directories.join(", "),
+        files_to_check.join("\n")
+    );
+    if interactive_mode {
+        loop {
+            println!("Are you sure, that you want to convert this files? y/N");
+            let mut ret = String::new();
+            io::stdin().read_line(&mut ret).expect("Failed to read from stdin");
+            ret = ret.trim().to_string();
+            if ret == "y" || ret == "Y" {
+                break;
+            } else if ret == "N" || ret == "n" || ret.is_empty() {
+                process::exit(0);
+            }
+        }
+    }
+
+    for file_to_check in files_to_check {
+        match fs::read_to_string(&file_to_check) {
+            Ok(input) => match OpenOptions::new().truncate(true).write(true).open(&file_to_check) {
+                Ok(mut file_handler) => {
+                    let output = convert_file(input);
+                    writeln!(file_handler, "{}", output).unwrap();
+                }
+                Err(e) => {
+                    eprintln!("Failed to write file {}, reason {}", file_to_check, e);
+                }
+            },
+            Err(e) => {
+                eprintln!("Failed to read file {}, reason {}", file_to_check, e);
+            }
+        }
+    }
 }
 
 fn convert_file(file: String) -> String {
