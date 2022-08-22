@@ -1,4 +1,3 @@
 Text {
-text: "AA"
 
 }
