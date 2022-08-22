@@ -8,9 +8,11 @@ fn convert_file(file: String) -> String {
     lines = remove_empty_space_on_end_of_line(lines);
     lines = skip_start_end_empty_lines(lines);
 
-    // This functions are safe to think, that any non empty line starts with non empty character
+    // This functions are safe to think, that non empty lines starts and ends with non empty(" ", "\t") characters
+    lines = connect_multiple_empty_lines_into_one(lines);
     lines = move_single_open_bracket(lines);
     lines = remove_useless_spaces_around_colon(lines);
+    lines = remove_empty_line_before_close_bracket(lines);
 
     // Always at the end, before lines are guaranteed to start not with whitespace
     lines = move_elements_inside(lines);
@@ -118,6 +120,34 @@ fn move_single_open_bracket(lines: Vec<String>) -> Vec<String> {
     collected_lines
 }
 
+fn connect_multiple_empty_lines_into_one(lines: Vec<String>) -> Vec<String> {
+    let mut collected_lines: Vec<String> = Vec::new();
+    let mut was_empty = false;
+    for line in lines {
+        if line.is_empty() {
+            if was_empty {
+                continue;
+            }
+            was_empty = true;
+        } else {
+            was_empty = false;
+        }
+        collected_lines.push(line);
+    }
+    collected_lines
+}
+
+fn remove_empty_line_before_close_bracket(lines: Vec<String>) -> Vec<String> {
+    let mut collected_lines: Vec<String> = Vec::new();
+    for line in lines {
+        if line == "}" && collected_lines.last() == Some(&"".to_string()) {
+            collected_lines.pop();
+        }
+        collected_lines.push(line);
+    }
+    collected_lines
+}
+
 #[allow(unused)]
 fn split_text_to_vector(text: &str) -> Vec<String> {
     text.split('\n').map(str::to_string).collect()
@@ -127,6 +157,38 @@ fn split_text_to_vector(text: &str) -> Vec<String> {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn test_remove_empty_line_before_close_bracket() {
+        let input = r#"Text {
+text: "TODO"
+
+}"#;
+        let expected_output = r#"Text {
+text: "TODO"
+}"#;
+        assert_eq!(remove_empty_line_before_close_bracket(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+
+    #[test]
+    fn test_connect_multiple_empty_lines_into_one() {
+        let input = r#"
+Text {}
+
+
+
+
+
+
+Text {}
+"#;
+        let expected_output = r#"
+Text {}
+
+Text {}
+"#;
+        assert_eq!(connect_multiple_empty_lines_into_one(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
 
     #[test]
     fn test_move_single_open_bracket() {
@@ -211,6 +273,8 @@ Text {}
             "7_space_after_colon_in_string",
             "8_space_after_colon_in_string_with_slash",
             "9_single_open_bracket",
+            "10_multiple_empty_lines",
+            "11_empty_line_before_ending",
         ];
         for test_name in tests {
             println!("Testing {}", test_name);
