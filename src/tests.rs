@@ -5,6 +5,24 @@ mod tests {
     use std::fs;
 
     #[test]
+    fn test_space_before_bracket() {
+        let input = r#"Text{"#;
+        let expected_output = r#"Text {"#;
+        assert_eq!(space_before_bracket(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+    #[test]
+    fn test_if_movement() {
+        let input = r#"
+    if(abc)
+    bcd
+"#;
+        let expected_output = r#"
+    if (abc)
+        bcd
+"#;
+        assert_eq!(if_movement(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+    #[test]
     fn test_remove_empty_line_before_close_bracket() {
         let input = r#"Text {
 text: "TODO"
@@ -128,6 +146,8 @@ Text {}
             "9_single_open_bracket",
             "10_multiple_empty_lines",
             "11_empty_line_before_ending",
+            "12_if_else_mismatch",
+            "13_if_oneliner",
             "example",
         ];
         for test_name in tests {

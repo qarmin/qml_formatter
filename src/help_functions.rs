@@ -10,7 +10,7 @@ pub fn collect_files_to_check() -> (bool, Vec<String>, Vec<String>) {
     let mut excluded_directories = Vec::new();
     for argument in arguments.into_iter().skip(1) {
         if argument == "NO_QUESTION" {
-            interactive_mode = true
+            interactive_mode = false
         } else if let Some(directory) = argument.strip_prefix("-e") {
             if Path::new(directory).exists() {
                 excluded_directories.push(argument)

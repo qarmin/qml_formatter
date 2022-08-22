@@ -47,7 +47,11 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(line.clone());
         } else {
             let mut new_line = "".to_string();
-            let spaces_to_add = if line.trim() == "}" { current_bracket_number - 1 } else { current_bracket_number };
+            let spaces_to_add = if line.trim().starts_with("}") {
+                current_bracket_number - 1
+            } else {
+                current_bracket_number
+            };
             for _ in 0..spaces_to_add {
                 new_line.push_str("    ") // 4 spaces is default for QML
             }
@@ -131,6 +135,53 @@ pub fn remove_empty_line_before_close_bracket(lines: Vec<String>) -> Vec<String>
         collected_lines.push(line);
     }
     collected_lines
+}
+
+pub fn if_movement(lines: Vec<String>) -> Vec<String> {
+    let mut new_lines = Vec::new();
+    let mut find_oneliner = false;
+    for line in lines {
+        let mut new_line = "".to_string();
+        if find_oneliner {
+            new_line.push_str("    ");
+            find_oneliner = false
+        }
+
+        new_line.push_str(&line);
+        new_line = new_line.replace(" if(", " if (");
+        new_line = new_line.replace(" else if(", " else if (");
+        new_line = new_line.replace(" else {", " else {");
+        new_lines.push(new_line.clone());
+
+        let line_trimmed = new_line.trim();
+        if (line_trimmed.starts_with("if (") || line_trimmed.starts_with("else if (")) && line_trimmed.ends_with(")") || line_trimmed == "else" {
+            find_oneliner = true
+        }
+    }
+    new_lines
+}
+
+pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
+    let mut new_lines = Vec::new();
+    for line in lines {
+        if line.contains("{") {
+            let mut new_line: Vec<char> = Vec::new();
+            for charr in line.chars() {
+                if charr == '{' {
+                    if new_line.last() != Some(&' ') && new_line.last() != None {
+                        new_line.push(' ');
+                    }
+                    new_line.push(charr);
+                } else {
+                    new_line.push(charr);
+                }
+            }
+            new_lines.push(new_line.iter().collect())
+        } else {
+            new_lines.push(line);
+        }
+    }
+    new_lines
 }
 
 #[allow(unused)]

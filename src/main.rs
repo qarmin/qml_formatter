@@ -6,7 +6,6 @@ use crate::help_functions::*;
 use crate::rules::*;
 
 use std::fs::OpenOptions;
-use std::io::Read;
 use std::io::Write;
 
 use std::{fs, io, process};
@@ -39,7 +38,7 @@ fn main() {
             Ok(input) => match OpenOptions::new().truncate(true).write(true).open(&file_to_check) {
                 Ok(mut file_handler) => {
                     let output = convert_file(input);
-                    writeln!(file_handler, "{}", output).unwrap();
+                    write!(file_handler, "{}", output).unwrap();
                 }
                 Err(e) => {
                     eprintln!("Failed to write file {}, reason {}", file_to_check, e);
@@ -63,9 +62,13 @@ fn convert_file(file: String) -> String {
     lines = move_single_open_bracket(lines);
     lines = remove_useless_spaces_around_colon(lines);
     lines = remove_empty_line_before_close_bracket(lines);
+    lines = space_before_bracket(lines);
 
     // Always at the end, before lines are guaranteed to start not with whitespace
     lines = move_elements_inside(lines);
+
+    // Small fixes to already converted project
+    lines = if_movement(lines);
 
     lines.join("\n")
 }
