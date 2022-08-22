@@ -3,12 +3,16 @@ fn main() {
 }
 
 fn convert_file(file: String) -> String {
-    let mut lines: Vec<_> = file.split("\n").map(|e| e.to_string()).collect();
+    let mut lines: Vec<_> = file.split('\n').map(|e| e.to_string()).collect();
 
     lines = remove_empty_space_on_end_of_line(lines);
     lines = skip_start_end_empty_lines(lines);
-    lines = move_elements_inside(lines);
+
+    // This functions are safe to think, that any non empty line starts with non empty character
     lines = remove_useless_spaces_around_colon(lines);
+
+    // Always at the end, before lines are guaranteed to start not with whitespace
+    lines = move_elements_inside(lines);
 
     lines.join("\n")
 }
@@ -16,45 +20,34 @@ fn convert_file(file: String) -> String {
 fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     for line in lines {
-        let mut new_line;
-        if line.contains(":") {
-            new_line = "".to_string();
-            'start_spaces_loop: loop {
-                for char in line.chars() {
-                    if char == ' ' {
-                        new_line.push(' ')
-                    } else {
-                        break 'start_spaces_loop;
+        let new_line;
+        if line.contains(':') {
+            let chars_to_check: Vec<char> = line.trim_start().chars().collect();
+            let mut collected_chars: Vec<char> = Vec::new();
+
+            let mut quote_is_started = false;
+            for item in chars_to_check {
+                if item == ' ' {
+                    if quote_is_started || collected_chars.last() != Some(&' ') {
+                        collected_chars.push(' ');
                     }
+                } else if item == ':' {
+                    if !quote_is_started && collected_chars.last() == Some(&' ') {
+                        collected_chars.pop();
+                    }
+                    collected_chars.push(item);
+                } else if item == '"' {
+                    // TODO add support for ', because is probably supported
+                    if collected_chars.last() != Some(&'\\') {
+                        quote_is_started = !quote_is_started;
+                    }
+                    collected_chars.push(item);
+                } else {
+                    collected_chars.push(item)
                 }
             }
 
-            let mut quote_is_started: bool = false;
-            let mut previous_character_is_slash = false;
-            for char in line.chars() {
-                if char == ' ' {
-                    previous_character_is_slash = false;
-                    if quote_is_started {
-                        new_line.push(' ')
-                    }
-                } else if char == ':' {
-                    previous_character_is_slash = false;
-                    new_line.push(char);
-                    new_line.push(' ');
-                } else if char == '"' {
-                    if !previous_character_is_slash {
-                        quote_is_started = !quote_is_started;
-                    }
-                    previous_character_is_slash = false;
-                    new_line.push(char);
-                } else if char == '\\' {
-                    previous_character_is_slash = true;
-                    new_line.push(char);
-                } else {
-                    previous_character_is_slash = false;
-                    new_line.push(char);
-                }
-            }
+            new_line = collected_chars.into_iter().collect();
         } else {
             new_line = line;
         }
@@ -73,11 +66,7 @@ fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(line.clone());
         } else {
             let mut new_line = "".to_string();
-            let spaces_to_add = if line.trim() == "}" {
-                current_bracket_number - 1
-            } else {
-                current_bracket_number
-            };
+            let spaces_to_add = if line.trim() == "}" { current_bracket_number - 1 } else { current_bracket_number };
             for _ in 0..spaces_to_add {
                 new_line.push_str("    ") // 4 spaces is default for QML
             }
@@ -85,10 +74,10 @@ fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(new_line.trim_end().to_string()); // Trimming, because empty line with only spaces could be here
         }
 
-        if line.contains("{") {
+        if line.contains('{') {
             current_bracket_number += 1;
         }
-        if line.contains("}") {
+        if line.contains('}') {
             if current_bracket_number == 0 {
                 println!("Mismatched number of {{ brackets, probably QML is broken");
             } else {
@@ -113,10 +102,75 @@ fn skip_start_end_empty_lines(mut lines: Vec<String>) -> Vec<String> {
     lines
 }
 
+#[allow(unused)]
+fn split_text_to_vector(text: &str) -> Vec<String> {
+    text.split('\n').map(str::to_string).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn test_remove_useless_spaces_around_colon() {
+        let input = r#"property var roman   :    ABCD"#;
+        let expected_output = r#"property var roman: ABCD"#;
+        assert_eq!(remove_useless_spaces_around_colon(split_text_to_vector(input)), split_text_to_vector(expected_output));
+
+        let input = r#"property var roman   :    "ABCD    :    ABCD""#;
+        let expected_output = r#"property var roman: "ABCD    :    ABCD""#;
+        assert_eq!(remove_useless_spaces_around_colon(split_text_to_vector(input)), split_text_to_vector(expected_output));
+
+        let input = r#"text: "ABCD \" \" \", \":   \" \" \" \" \" \"""#;
+        let expected_output = r#"text: "ABCD \" \" \", \":   \" \" \" \" \" \"""#;
+        assert_eq!(remove_useless_spaces_around_colon(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+
+    #[test]
+    fn test_move_elements_inside() {
+        let input = r#"
+Text {
+Label {
+Text {}
+}
+}
+"#;
+        let expected_output = r#"
+Text {
+    Label {
+        Text {}
+    }
+}
+"#;
+        assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+
+    #[test]
+    fn test_remove_empty_space_on_end_of_line() {
+        let input = r#"
+        
+Text {}         
+                 
+"#;
+        let expected_output = r#"
+
+Text {}
+
+"#;
+        assert_eq!(remove_empty_space_on_end_of_line(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+
+    #[test]
+    fn test_skip_start_end_empty_lines() {
+        let input = r#"
+
+Text {}
+
+"#;
+        let expected_output = r#"Text {}"#;
+        assert_eq!(skip_start_end_empty_lines(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
 
     #[test]
     fn test_conversion() {
@@ -129,7 +183,7 @@ mod tests {
             "5_not_mismatched_space_inside",
             "6_space_after_colon",
             "7_space_after_colon_in_string",
-            "8_space_after_colon_in_string_with_c",
+            "8_space_after_colon_in_string_with_slash",
         ];
         for test_name in tests {
             println!("Testing {}", test_name);
