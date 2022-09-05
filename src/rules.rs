@@ -200,7 +200,7 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
         new_lines.push(new_line.clone());
 
         let line_trimmed = new_line.trim();
-        if line_trimmed.ends_with(')') && (["if (", "else if (", "for ("].iter().any(|e|line_trimmed.starts_with(e)) || line_trimmed == "else") {
+        if line_trimmed == "else" || line_trimmed.ends_with(')') && ["if (", "else if (", "for ("].iter().any(|e|line_trimmed.starts_with(e))  {
              {
                 find_oneliner = true
             }
