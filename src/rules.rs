@@ -5,31 +5,38 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     for line in lines {
         let new_line;
         if line.contains(':') {
-            let chars_to_check: Vec<char> = line.trim_start().chars().collect();
             let mut collected_chars: Vec<char> = Vec::new();
 
-            let mut quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
-            for item in chars_to_check {
-                if item == ' ' {
-                    if quote_char.is_some() || collected_chars.last() != Some(&' ') {
-                        collected_chars.push(' ');
-                    }
-                } else if item == ':' {
-                    if quote_char.is_none() && collected_chars.last() == Some(&' ') {
-                        collected_chars.pop();
-                    }
-                    collected_chars.push(item);
-                } else if item == '"' || item == '\'' || item == '`' {
-                    if collected_chars.last() != Some(&'\\') {
-                        if quote_char.is_none() {
-                            quote_char = Some(item);
-                        } else if Some(item) == quote_char {
-                            quote_char = None;
+            let quote_char: Option<char> = None;
+
+            for (text_type, part) in split_text_into_comment_part(line.trim_start(), quote_char) {
+                if text_type == UserTextOrNot::QMLCode {
+                    for charr in part.chars() {
+                        if charr == ' ' {
+                            if collected_chars.last() != Some(&' ') {
+                                collected_chars.push(' ');
+                            }
+                        } else if charr == ':' {
+                            if collected_chars.contains(&'?') {
+                                if collected_chars.last() != Some(&' ') {
+                                    collected_chars.push(' ');
+                                    collected_chars.push(charr);
+                                    collected_chars.push(' ');
+                                } else {
+                                    collected_chars.push(charr);
+                                }
+                            } else {
+                                if collected_chars.last() == Some(&' ') {
+                                    collected_chars.pop();
+                                }
+                                collected_chars.push(charr);
+                            }
+                        } else {
+                            collected_chars.push(charr)
                         }
                     }
-                    collected_chars.push(item);
                 } else {
-                    collected_chars.push(item)
+                    collected_chars.append(&mut part.chars().collect::<Vec<_>>());
                 }
             }
 
@@ -173,6 +180,7 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
         new_line = new_line.replace(" if(", " if (");
         new_line = new_line.replace(" else if(", " else if (");
         new_line = new_line.replace(" else {", " else {");
+        new_line = new_line.replace(" for(", " for {");
         new_lines.push(new_line.clone());
 
         let line_trimmed = new_line.trim();
@@ -185,7 +193,7 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
 
 pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
-    let mut quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
+    let quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
     for line in lines {
         if line.contains("{") {
             let mut new_line: Vec<char> = Vec::new();

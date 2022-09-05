@@ -169,7 +169,7 @@ Text {}
             "13_if_oneliner",
             "14_different_quotes",
             "15_square_bracket",
-            // "16_space_after_colon_ternary",
+            "16_space_after_colon_ternary",
             "example",
         ];
         for test_name in tests {
