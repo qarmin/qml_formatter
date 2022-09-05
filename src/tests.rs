@@ -84,6 +84,10 @@ Text {}
         let input = r#"text: "ABCD \" \" \", \":   \" \" \" \" \" \"""#;
         let expected_output = r#"text: "ABCD \" \" \", \":   \" \" \" \" \" \"""#;
         assert_eq!(remove_useless_spaces_around_colon(split_text_to_vector(input)), split_text_to_vector(expected_output));
+
+        let input = r#"property var roman:ABCD"#;
+        let expected_output = r#"property var roman:ABCD"#;
+        assert_eq!(remove_useless_spaces_around_colon(split_text_to_vector(input)), split_text_to_vector(expected_output));
     }
 
     #[test]
@@ -165,6 +169,7 @@ Text {}
             "13_if_oneliner",
             "14_different_quotes",
             "15_square_bracket",
+            // "16_space_after_colon_ternary",
             "example",
         ];
         for test_name in tests {

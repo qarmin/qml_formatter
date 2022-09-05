@@ -1,3 +1,5 @@
+use crate::split_text_into_parts_to_read::{split_text_into_comment_part, UserTextOrNot};
+
 pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     for line in lines {
@@ -187,23 +189,18 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     for line in lines {
         if line.contains("{") {
             let mut new_line: Vec<char> = Vec::new();
-            for charr in line.chars() {
-                if charr == '"' || charr == '\'' || charr == '`' {
-                    if new_line.last() != Some(&'\\') {
-                        if quote_char.is_none() {
-                            quote_char = Some(charr);
-                        } else if Some(charr) == quote_char {
-                            quote_char = None;
+            for (text_type, part) in split_text_into_comment_part(&line, quote_char) {
+                if text_type == UserTextOrNot::QMLCode {
+                    for charr in part.chars() {
+                        if charr == '{' {
+                            if new_line.last() != Some(&' ') && new_line.last() != None {
+                                new_line.push(' ');
+                            }
                         }
+                        new_line.push(charr);
                     }
-                    new_line.push(charr);
-                } else if charr == '{' {
-                    if quote_char.is_none() && new_line.last() != Some(&' ') && new_line.last() != None {
-                        new_line.push(' ');
-                    }
-                    new_line.push(charr);
                 } else {
-                    new_line.push(charr);
+                    new_line.append(&mut part.chars().collect::<Vec<_>>());
                 }
             }
             new_lines.push(new_line.iter().collect())
