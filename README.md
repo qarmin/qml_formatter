@@ -25,7 +25,7 @@ qml_formatter /home/a /home/b -e/home/a/not_to_check -e/home/a/completelly
 ```
 will list all files inside folder `/home/a` and `/home/b` that are not inside `/home/a/not_to_check` and `/home/a/completelly`.
 
-By default app runs in interactive mode which require to confirm formatting, but there is additional argument `NO_QUESTION` which format files without questions e.g.
+By default, app runs in interactive mode which require to confirm formatting, but there is additional argument `NO_QUESTION` which format files without questions e.g.
 ```commandline
 qml_formatter /home/a NO_QUESTION
 ```
@@ -73,3 +73,7 @@ Text {
 
 ```
 
+# TODO
+- support for Javascript/HTML/C++ comments
+- switch/case
+- better multi-line support

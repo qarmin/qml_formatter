@@ -1,17 +1,16 @@
 extern crate core;
 
-mod help_functions;
-mod rules;
-mod split_text_into_parts_to_read;
-mod tests;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::{fs, io, process};
 
 use crate::help_functions::*;
 use crate::rules::*;
 
-use std::fs::OpenOptions;
-use std::io::Write;
-
-use std::{fs, io, process};
+mod help_functions;
+mod rules;
+mod split_text_into_parts_to_read;
+mod tests;
 
 fn main() {
     let (interactive_mode, included_directories, files_to_check) = collect_files_to_check();
@@ -36,7 +35,8 @@ fn main() {
         }
     }
 
-    for file_to_check in files_to_check {
+    for (index, file_to_check) in files_to_check.iter().enumerate() {
+        println!("Checking file {}/{} - {}", index + 1, files_to_check.len() + 1, file_to_check);
         match fs::read_to_string(&file_to_check) {
             Ok(input) => match OpenOptions::new().truncate(true).write(true).open(&file_to_check) {
                 Ok(mut file_handler) => {

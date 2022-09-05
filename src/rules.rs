@@ -18,7 +18,7 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
                             if collected_chars.last() != Some(&' ') {
                                 collected_chars.push(' ');
                             }
-                        }else if charr == '?' {
+                        } else if charr == '?' {
                             if collected_chars.last() != Some(&' ') {
                                 collected_chars.push(' ');
                                 collected_chars.push(charr);
@@ -200,8 +200,8 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
         new_lines.push(new_line.clone());
 
         let line_trimmed = new_line.trim();
-        if line_trimmed == "else" || line_trimmed.ends_with(')') && ["if (", "else if (", "for ("].iter().any(|e|line_trimmed.starts_with(e))  {
-             {
+        if line_trimmed == "else" || line_trimmed.ends_with(')') && ["if (", "else if (", "for ("].iter().any(|e| line_trimmed.starts_with(e)) {
+            {
                 find_oneliner = true
             }
         }
