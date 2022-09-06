@@ -1,7 +1,13 @@
 [package]
 name = "qml_formatter"
 version = "0.1.0"
+authors = ["Rafał Mikrut <mikrutrafal@protonmail.com>"]
 edition = "2021"
+rust-version = "1.60"
+description = "QML formatter"
+license = "MIT"
+homepage = "https://github.com/qarmin/qml_formatter"
+repository = "https://github.com/qarmin/qml_formatter"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
