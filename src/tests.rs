@@ -140,6 +140,24 @@ Service[
 ]
 "#;
         assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
+        let input = r#"
+Service[([{[
+]}])]
+"#;
+        let expected_output = r#"
+Service[([{[
+]}])]
+"#;
+        assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
+        let input = r#"
+Service[([{[
+]}])])]}]]}}]}
+"#;
+        let expected_output = r#"
+Service[([{[
+]}])])]}]]}}]}
+"#;
+        assert_eq!(move_elements_inside(split_text_to_vector(input)), split_text_to_vector(expected_output));
     }
 
     #[test]
@@ -190,6 +208,7 @@ Text {}
             "16_space_after_colon_ternary",
             "17_no_space_when_between_brackets",
             "18_valid_state_brackets",
+            "19_multiple_closing_brackets",
             "example",
         ];
         for test_name in tests {

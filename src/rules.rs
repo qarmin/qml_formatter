@@ -69,12 +69,21 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(line.clone());
         } else {
             let mut new_line = "".to_string();
-            let spaces_to_add = if line.trim().starts_with('}') || line.trim().starts_with(')') || line.trim().starts_with(']') {
-                current_bracket_number - 1
-            } else {
-                current_bracket_number
-            };
-            for _ in 0..spaces_to_add {
+
+            let mut closing_brackets = 0;
+            {
+                let mut line_trimmed = line.chars().collect::<Vec<_>>();
+                while !line_trimmed.is_empty() {
+                    if ['}', ')', ']'].contains(&line_trimmed[0]) {
+                        line_trimmed.remove(0);
+                        closing_brackets += 1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            for _ in 0..(current_bracket_number as i32 - closing_brackets) {
                 new_line.push_str("    ") // 4 spaces is default for QML
             }
             new_line.push_str(&line);
