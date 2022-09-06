@@ -69,7 +69,7 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             new_lines.push(line.clone());
         } else {
             let mut new_line = "".to_string();
-            let spaces_to_add = if line.trim().starts_with('}') || line.trim().starts_with(')') {
+            let spaces_to_add = if line.trim().starts_with('}') || line.trim().starts_with(')') || line.trim().starts_with(']') {
                 current_bracket_number - 1
             } else {
                 current_bracket_number
@@ -219,9 +219,9 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
                 if text_type == UserTextOrNot::QMLCode {
                     for charr in part.chars() {
                         if charr == '{' {
-                            if new_line.last() != Some(&' ') && new_line.last() != Some(&'[') && new_line.last() != None {
+                            if new_line.last() != Some(&' ') && ![Some(&'['), Some(&'(')].contains(&new_line.last()) && new_line.last() != None {
                                 new_line.push(' ');
-                            } else if new_line.last() == Some(&' ') && new_line.get(new_line.len() - 2) == Some(&'[') {
+                            } else if new_line.last() == Some(&' ') && [Some(&'['), Some(&'(')].contains(&new_line.get(new_line.len() - 2)) {
                                 new_line.pop();
                             }
                         }
