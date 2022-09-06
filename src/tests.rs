@@ -170,6 +170,7 @@ Text {}
             "14_different_quotes",
             "15_square_bracket",
             "16_space_after_colon_ternary",
+            "17_no_space_when_between_brackets",
             "example",
         ];
         for test_name in tests {

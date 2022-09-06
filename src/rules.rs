@@ -219,8 +219,10 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
                 if text_type == UserTextOrNot::QMLCode {
                     for charr in part.chars() {
                         if charr == '{' {
-                            if new_line.last() != Some(&' ') && new_line.last() != None {
+                            if new_line.last() != Some(&' ') && new_line.last() != Some(&'[') && new_line.last() != None {
                                 new_line.push(' ');
+                            } else if new_line.last() == Some(&' ') && new_line.get(new_line.len() - 2) == Some(&'[') {
+                                new_line.pop();
                             }
                         }
                         new_line.push(charr);
