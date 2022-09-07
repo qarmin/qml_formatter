@@ -258,13 +258,18 @@ pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
         let (mut line, comments) = split_into_normal_and_comment_part(&line);
         if !line.ends_with(']') {
             if let Some(model_start_position) = model_bracket_start_position {
-                let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
-                let mut new_line = "".to_string();
-                for _ in 0..difference {
-                    new_line.push(' ');
+                // If thing inside is self created QML object, do not use tabs
+                if !line.ends_with(" {") {
+                    let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
+                    let mut new_line = "".to_string();
+                    for _ in 0..difference {
+                        new_line.push(' ');
+                    }
+                    new_line.push_str(&line);
+                    line = new_line;
+                } else {
+                    model_bracket_start_position = None;
                 }
-                new_line.push_str(&line);
-                line = new_line;
             } else {
                 if let Some(start_index) = line.find(": [") {
                     for (index, charr) in line.chars().enumerate() {

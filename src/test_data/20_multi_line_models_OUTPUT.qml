@@ -5,4 +5,9 @@ model: [{ "name": qsTr("Keksz"), "data": "Keksz" },
 model: [model2,
         model2,
         model2]
-    
+
+states: [
+     State {
+        name:ready
+     }
+]

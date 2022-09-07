@@ -212,6 +212,21 @@ Text {
 }
 "#;
         assert_eq!(reorganize_space_in_models(split_text_to_vector(input)), split_text_to_vector(expected_output));
+        let input = r#"
+states: [
+    State {
+    name:readyS
+    }
+]
+"#;
+        let expected_output = r#"
+states: [
+    State {
+    name:readyS
+    }
+]
+"#;
+        assert_eq!(reorganize_space_in_models(split_text_to_vector(input)), split_text_to_vector(expected_output));
     }
 
     #[test]
