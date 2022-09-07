@@ -225,15 +225,48 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
     new_lines
 }
 
+pub fn connect_end_lines(lines: Vec<String>) -> Vec<String> {
+    let mut new_lines = Vec::new();
+    let mut next_line_with_addition = false;
+    for line in lines {
+        let (line, comments) = split_into_normal_and_comment_part(&line);
+        let mut spaces = "".to_string();
+
+        if next_line_with_addition {
+            next_line_with_addition = false;
+            spaces = "    ".to_string();
+        }
+
+        if ["+", "-", ":", "?"].iter().any(|e| line.ends_with(e)) {
+            next_line_with_addition = true;
+        }
+
+        new_lines.push(format!("{}{}{}", spaces, line, comments));
+    }
+    new_lines
+}
+
 pub fn switch_case(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut case_started = false;
+    let mut current_case_line = 0;
     for line in lines {
         let mut new_line = "".to_string();
+
+        if case_started {
+            current_case_line += 1;
+        }
+
+        // First line is already handled by adding spaces when previous line ends with : (connect_end_lines)
+        if current_case_line == 1 {
+            new_lines.push(line);
+            continue;
+        }
 
         let line_trimmed = line.trim();
         if line_trimmed.starts_with("case ") && line_trimmed.ends_with(":") {
             case_started = true;
+            current_case_line = 0
         } else {
             if case_started && line_trimmed != "}" {
                 new_line.push_str("    ");
