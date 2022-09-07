@@ -36,7 +36,7 @@ fn main() {
     }
 
     for (index, file_to_check) in files_to_check.iter().enumerate() {
-        println!("Checking file {}/{} - {}", index + 1, files_to_check.len() + 1, file_to_check);
+        println!("Checking file {}/{} - {}", index + 1, files_to_check.len(), file_to_check);
         match fs::read_to_string(&file_to_check) {
             Ok(input) => match OpenOptions::new().truncate(true).write(true).open(&file_to_check) {
                 Ok(mut file_handler) => {

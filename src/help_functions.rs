@@ -65,3 +65,78 @@ pub fn calculate_empty_spaces_at_start(line: &str) -> i32 {
     }
     return counter;
 }
+
+pub fn split_into_normal_and_comment_part(line: &str) -> (String, String) {
+    let mut separator: Option<char> = None;
+    let mut normal_text = "".to_string();
+    let mut comment_part = "".to_string();
+    if !line.contains("//") {
+        normal_text = line.to_string();
+    } else {
+        let characters: Vec<_> = line.chars().collect();
+        let mut found_comment = false;
+        for (index, charr) in characters.iter().enumerate() {
+            match charr {
+                '\'' | '"' | '`' => {
+                    if let Some(sep_char) = separator {
+                        if sep_char == *charr {
+                            separator = None;
+                        }
+                    } else {
+                        separator = Some(*charr);
+                    }
+                }
+                '/' => {
+                    if separator.is_none() && characters.get(index + 1) == Some(&'/') {
+                        let ind = if index > 0 && characters.get(index - 1) == Some(&' ') { index - 1 } else { index };
+                        for (i, character) in characters.iter().enumerate() {
+                            if i < ind {
+                                normal_text.push(*character);
+                            } else {
+                                comment_part.push(*character);
+                            }
+                        }
+                        found_comment = true;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        if !found_comment {
+            normal_text = line.to_string();
+        }
+    }
+
+    return (normal_text, comment_part);
+}
+
+#[test]
+pub fn test_calculate_empty_spaces_at_start() {
+    let input = r##"input_text"##;
+    let output = 0;
+    assert_eq!(output, calculate_empty_spaces_at_start(input));
+
+    let input = r##"    input_text"##;
+    let output = 4;
+    assert_eq!(output, calculate_empty_spaces_at_start(input));
+}
+
+#[test]
+pub fn test_split_into_normal_and_comment_part() {
+    let input = r##"input_text"##;
+    let output = (r##"input_text"##.to_string(), r##""##.to_string());
+    assert_eq!(output, split_into_normal_and_comment_part(input));
+
+    let input = r##"input_text // ABC"##;
+    let output = (r##"input_text"##.to_string(), r##" // ABC"##.to_string());
+    assert_eq!(output, split_into_normal_and_comment_part(input));
+
+    let input = r##""input_text//" // ABC"##;
+    let output = (r##""input_text//""##.to_string(), r##" // ABC"##.to_string());
+    assert_eq!(output, split_into_normal_and_comment_part(input));
+
+    let input = r##"image: "qrc://image.svg""##;
+    let output = (r##"image: "qrc://image.svg""##.to_string(), r##""##.to_string());
+    assert_eq!(output, split_into_normal_and_comment_part(input));
+}

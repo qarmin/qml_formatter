@@ -1,8 +1,8 @@
 #![allow(clippy::needless_late_init)]
 #![allow(clippy::collapsible_if)]
 
-use crate::calculate_empty_spaces_at_start;
 use crate::split_text_into_parts_to_read::{split_text_into_comment_part, UserTextOrNot};
+use crate::{calculate_empty_spaces_at_start, split_into_normal_and_comment_part};
 use std::cmp::max;
 
 pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
@@ -254,7 +254,8 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
 pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut model_bracket_start_position: Option<usize> = None;
-    for mut line in lines.clone() {
+    for line in lines {
+        let (mut line, comments) = split_into_normal_and_comment_part(&line);
         if !line.ends_with(']') {
             if let Some(model_start_position) = model_bracket_start_position {
                 let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
@@ -281,17 +282,20 @@ pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
             }
         } else {
             if let Some(model_start_position) = model_bracket_start_position {
-                let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
-                let mut new_line = "".to_string();
-                for _ in 0..difference {
-                    new_line.push(' ');
+                if !["", "]"].contains(&line.trim()) {
+                    let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
+                    let mut new_line = "".to_string();
+                    for _ in 0..difference {
+                        new_line.push(' ');
+                    }
+                    new_line.push_str(&line);
+                    line = new_line;
                 }
-                new_line.push_str(&line);
-                line = new_line;
                 model_bracket_start_position = None;
             }
         }
 
+        line.push_str(&comments);
         new_lines.push(line);
     }
     new_lines
