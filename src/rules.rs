@@ -221,6 +221,29 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
     new_lines
 }
 
+pub fn switch_case(lines: Vec<String>) -> Vec<String> {
+    let mut new_lines = Vec::new();
+    let mut case_started = false;
+    for line in lines {
+        let mut new_line = "".to_string();
+
+        let line_trimmed = line.trim();
+        if line_trimmed.starts_with("case ") && line_trimmed.ends_with(":") {
+            case_started = true;
+        } else {
+            if case_started && line_trimmed != "}" {
+                new_line.push_str("    ");
+            } else {
+                case_started = false;
+            }
+        }
+
+        new_line.push_str(&line);
+        new_lines.push(new_line);
+    }
+    new_lines
+}
+
 pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"

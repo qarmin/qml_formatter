@@ -252,7 +252,8 @@ states: [
             "17_no_space_when_between_brackets",
             "18_valid_state_brackets",
             "19_multiple_closing_brackets",
-            // "20_multi_line_models",
+            "20_multi_line_models",
+            "21_switch_case",
             "example",
         ];
         for test_name in tests {

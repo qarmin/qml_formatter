@@ -1,5 +1,5 @@
-number = 20
-name = "multi_line_models"
+number = 21
+name = "switch_case"
 
 
 open("src/test_data/" + str(number) + "_" + name + "_INPUT.qml", "w")

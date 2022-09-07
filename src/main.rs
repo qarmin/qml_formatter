@@ -73,6 +73,7 @@ fn convert_file(file: String) -> String {
 
     // Small fixes to already converted project
     lines = if_movement(lines);
+    lines = switch_case(lines);
 
     lines.push("".to_string()); // File should end with empty line
     lines.join("\n")

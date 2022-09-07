@@ -7,7 +7,7 @@ model: [model2,
     model2]
     
 states: [
-     State {
-     name:ready
-     }
+    State {
+    name:ready
+    }
 ]
