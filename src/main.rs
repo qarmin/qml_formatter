@@ -69,6 +69,7 @@ fn convert_file(file: String) -> String {
 
     // Always at the end, before lines are guaranteed to start not with whitespace
     lines = move_elements_inside(lines);
+    lines = reorganize_space_in_models(lines);
 
     // Small fixes to already converted project
     lines = if_movement(lines);

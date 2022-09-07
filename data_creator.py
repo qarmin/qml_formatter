@@ -1,5 +1,5 @@
-number = 19
-name = "multiple_closing_brackets"
+number = 20
+name = "multi_line_models"
 
 
 open("src/test_data/" + str(number) + "_" + name + "_INPUT.qml", "w")

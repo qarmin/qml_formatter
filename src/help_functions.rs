@@ -53,3 +53,15 @@ pub fn collect_files_to_check() -> (bool, Vec<String>, Vec<String>) {
     included_directories.sort_unstable();
     (interactive_mode, included_directories, collected_files)
 }
+
+pub fn calculate_empty_spaces_at_start(line: &str) -> i32 {
+    let mut counter = 0;
+    for charr in line.chars() {
+        if charr == ' ' {
+            counter += 1;
+        } else {
+            break;
+        }
+    }
+    return counter;
+}

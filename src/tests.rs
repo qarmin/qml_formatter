@@ -187,6 +187,23 @@ Text {}
     }
 
     #[test]
+    fn test_reorganize_space_in_models() {
+        let input = r#"
+model: [{ "name": qsTr("Keksz"), "data": "Keksz" },
+    { "name": qsTr("Static"), "data": "Static" },
+    { "name": qsTr("Bs"), "data": "Bs" }]
+abc
+"#;
+        let expected_output = r#"
+model: [{ "name": qsTr("Keksz"), "data": "Keksz" },
+        { "name": qsTr("Static"), "data": "Static" },
+        { "name": qsTr("Bs"), "data": "Bs" }]
+abc
+"#;
+        assert_eq!(reorganize_space_in_models(split_text_to_vector(input)), split_text_to_vector(expected_output));
+    }
+
+    #[test]
     fn test_conversion() {
         let test_dir = "src/test_data/";
         let tests = [
@@ -209,6 +226,7 @@ Text {}
             "17_no_space_when_between_brackets",
             "18_valid_state_brackets",
             "19_multiple_closing_brackets",
+            "20_multi_line_models",
             "example",
         ];
         for test_name in tests {

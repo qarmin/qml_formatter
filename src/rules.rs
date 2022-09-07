@@ -1,6 +1,9 @@
 #![allow(clippy::needless_late_init)]
 #![allow(clippy::collapsible_if)]
+
+use crate::calculate_empty_spaces_at_start;
 use crate::split_text_into_parts_to_read::{split_text_into_comment_part, UserTextOrNot};
+use std::cmp::max;
 
 pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
@@ -244,6 +247,52 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
         } else {
             new_lines.push(line);
         }
+    }
+    new_lines
+}
+
+pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
+    let mut new_lines = Vec::new();
+    let mut model_bracket_start_position: Option<usize> = None;
+    for mut line in lines.clone() {
+        if !line.ends_with(']') {
+            if let Some(model_start_position) = model_bracket_start_position {
+                let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
+                let mut new_line = "".to_string();
+                for _ in 0..difference {
+                    new_line.push(' ');
+                }
+                new_line.push_str(&line);
+                line = new_line;
+            } else {
+                if let Some(start_index) = line.find(": [") {
+                    for (index, charr) in line.chars().enumerate() {
+                        if charr.is_ascii_alphanumeric() || charr == '_' || charr.is_ascii_whitespace() {
+                            continue;
+                        } else if charr == ':' {
+                            if index == start_index {
+                                model_bracket_start_position = Some(index + 3);
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            if let Some(model_start_position) = model_bracket_start_position {
+                let difference = max(model_start_position as i32 - calculate_empty_spaces_at_start(&line), 0);
+                let mut new_line = "".to_string();
+                for _ in 0..difference {
+                    new_line.push(' ');
+                }
+                new_line.push_str(&line);
+                line = new_line;
+                model_bracket_start_position = None;
+            }
+        }
+
+        new_lines.push(line);
     }
     new_lines
 }
