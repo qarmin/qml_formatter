@@ -254,6 +254,7 @@ states: [
             "19_multiple_closing_brackets",
             "20_multi_line_models",
             "21_switch_case",
+            "22_regular_expression",
             "example",
         ];
         for test_name in tests {

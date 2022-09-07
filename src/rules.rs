@@ -9,6 +9,10 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     for line in lines {
         let new_line;
+        if line.trim().starts_with("regularExpression") {
+            new_lines.push(line);
+            continue;
+        }
         if line.contains(':') {
             let mut collected_chars: Vec<char> = Vec::new();
 

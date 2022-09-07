@@ -1,5 +1,5 @@
-number = 21
-name = "switch_case"
+number = 22
+name = "regular_expression"
 
 
 open("src/test_data/" + str(number) + "_" + name + "_INPUT.qml", "w")
