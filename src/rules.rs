@@ -2,12 +2,18 @@
 #![allow(clippy::collapsible_if)]
 
 use crate::split_text_into_parts_to_read::{split_text_into_comment_part, UserTextOrNot};
-use crate::{calculate_empty_spaces_at_start, split_into_normal_and_comment_part};
+use crate::{calculate_empty_spaces_at_start, check_for_multi_comment, split_into_normal_and_comment_part};
 use std::cmp::max;
 
 pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
+
         let new_line;
         if line.trim().starts_with("regularExpression") {
             new_lines.push(line);
@@ -71,7 +77,13 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
 pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
     let mut current_bracket_number = 0u32;
     let mut new_lines: Vec<String> = Vec::new();
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
+
         if current_bracket_number == 0 {
             new_lines.push(line.clone());
         } else {
@@ -135,7 +147,17 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
 }
 
 pub fn remove_empty_space_on_end_of_line(lines: Vec<String>) -> Vec<String> {
-    lines.into_iter().map(|e| e.trim().to_string()).collect()
+    let mut new_lines = Vec::new();
+    let mut multi_comment = false;
+    for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
+
+        new_lines.push(line.trim().to_string());
+    }
+    new_lines
 }
 
 pub fn skip_start_end_empty_lines(mut lines: Vec<String>) -> Vec<String> {
@@ -149,29 +171,34 @@ pub fn skip_start_end_empty_lines(mut lines: Vec<String>) -> Vec<String> {
 }
 
 pub fn move_single_open_bracket(lines: Vec<String>) -> Vec<String> {
-    let mut collected_lines: Vec<String> = Vec::new();
+    let mut new_lines: Vec<String> = Vec::new();
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         if line == "{" {
-            while let Some(last_line) = collected_lines.last() {
+            while let Some(last_line) = new_lines.last() {
                 if last_line.is_empty() {
-                    collected_lines.pop();
+                    new_lines.pop();
                 } else {
                     break;
                 }
             }
-            if let Some(last_line) = collected_lines.last_mut() {
+            if let Some(last_line) = new_lines.last_mut() {
                 last_line.push_str(" {");
             }
         } else {
-            collected_lines.push(line);
+            new_lines.push(line);
         }
     }
 
-    collected_lines
+    new_lines
 }
 
 pub fn connect_multiple_empty_lines_into_one(lines: Vec<String>) -> Vec<String> {
-    let mut collected_lines: Vec<String> = Vec::new();
+    let mut new_lines: Vec<String> = Vec::new();
     let mut was_empty = false;
     for line in lines {
         if line.is_empty() {
@@ -182,26 +209,36 @@ pub fn connect_multiple_empty_lines_into_one(lines: Vec<String>) -> Vec<String> 
         } else {
             was_empty = false;
         }
-        collected_lines.push(line);
+        new_lines.push(line);
     }
-    collected_lines
+    new_lines
 }
 
 pub fn remove_empty_line_before_close_bracket(lines: Vec<String>) -> Vec<String> {
-    let mut collected_lines: Vec<String> = Vec::new();
+    let mut new_lines: Vec<String> = Vec::new();
+    let mut multi_comment = false;
     for line in lines {
-        if line == "}" && collected_lines.last() == Some(&"".to_string()) {
-            collected_lines.pop();
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
         }
-        collected_lines.push(line);
+        if line == "}" && new_lines.last() == Some(&"".to_string()) {
+            new_lines.pop();
+        }
+        new_lines.push(line);
     }
-    collected_lines
+    new_lines
 }
 
 pub fn if_movement(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut find_oneliner = false;
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         let mut new_line = "".to_string();
         if find_oneliner {
             new_line.push_str("    ");
@@ -228,7 +265,12 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
 pub fn connect_end_lines(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut next_line_with_addition = false;
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         let (line, comments) = split_into_normal_and_comment_part(&line);
         let mut spaces = "".to_string();
 
@@ -250,7 +292,12 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut case_started = false;
     let mut current_case_line = 0;
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         let mut new_line = "".to_string();
 
         if case_started {
@@ -284,7 +331,12 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
 pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         if line.contains('{') {
             let mut new_line: Vec<char> = Vec::new();
             for (text_type, part) in split_text_into_comment_part(&line, quote_char) {
@@ -314,7 +366,12 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
 pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut model_bracket_start_position: Option<usize> = None;
+    let mut multi_comment = false;
     for line in lines {
+        if check_for_multi_comment(&line, &mut multi_comment) {
+            new_lines.push(line);
+            continue;
+        }
         let (mut line, comments) = split_into_normal_and_comment_part(&line);
         if !line.ends_with(']') {
             if let Some(model_start_position) = model_bracket_start_position {

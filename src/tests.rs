@@ -255,7 +255,7 @@ states: [
             "20_multi_line_models",
             "21_switch_case",
             "22_regular_expression",
-            "23_connect_at_end_line",
+            "23_connect_at_end_line","24_ignore_comments",
             "example",
         ];
         for test_name in tests {

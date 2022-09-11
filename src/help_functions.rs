@@ -111,6 +111,46 @@ pub fn split_into_normal_and_comment_part(line: &str) -> (String, String) {
     return (normal_text, comment_part);
 }
 
+pub fn check_for_multi_comment(line: &str, is_comment: &mut bool) -> bool {
+    let line_trimmed = line.trim();
+    if line_trimmed.starts_with("/*") {
+        *is_comment = true;
+        true
+    } else if line_trimmed.ends_with("*/") {
+        *is_comment = false;
+        true
+    } else {
+        *is_comment
+    }
+}
+
+#[test]
+pub fn test_check_for_multi_comment() {
+    let input_line = r##"input_text"##;
+    let mut is_commented = false;
+    let current_line_is_commented = check_for_multi_comment(input_line, &mut is_commented);
+    assert_eq!(current_line_is_commented, false);
+    assert_eq!(is_commented, false);
+
+    let input_line = r##"input_text"##;
+    let mut is_commented = true;
+    let current_line_is_commented = check_for_multi_comment(input_line, &mut is_commented);
+    assert_eq!(current_line_is_commented, true);
+    assert_eq!(is_commented, true);
+
+    let input_line = r##"/*input_text"##;
+    let mut is_commented = false;
+    let current_line_is_commented = check_for_multi_comment(input_line, &mut is_commented);
+    assert_eq!(current_line_is_commented, true);
+    assert_eq!(is_commented, true);
+
+    let input_line = r##"input_text*/"##;
+    let mut is_commented = false;
+    let current_line_is_commented = check_for_multi_comment(input_line, &mut is_commented);
+    assert_eq!(current_line_is_commented, true);
+    assert_eq!(is_commented, false);
+}
+
 #[test]
 pub fn test_calculate_empty_spaces_at_start() {
     let input = r##"input_text"##;
