@@ -1,3 +1,5 @@
+#![allow(clippy::collapsible_else_if)]
+
 extern crate core;
 
 use std::fs::OpenOptions;

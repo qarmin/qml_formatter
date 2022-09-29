@@ -258,6 +258,7 @@ states: [
             "23_connect_at_end_line",
             "24_ignore_comments",
             "25_multiple_question_mark",
+            "26_bracket_in_comment",
             "example",
         ];
         for test_name in tests {

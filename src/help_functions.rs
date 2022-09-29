@@ -123,6 +123,9 @@ pub fn check_for_multi_comment(line: &str, is_comment: &mut bool) -> bool {
         *is_comment
     }
 }
+pub fn check_for_single_line_comment(line: &str) -> bool {
+    line.trim().starts_with("//")
+}
 
 #[test]
 pub fn test_check_for_multi_comment() {

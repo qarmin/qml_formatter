@@ -2,14 +2,14 @@
 #![allow(clippy::collapsible_if)]
 
 use crate::split_text_into_parts_to_read::{split_text_into_comment_part, UserTextOrNot};
-use crate::{calculate_empty_spaces_at_start, check_for_multi_comment, split_into_normal_and_comment_part};
+use crate::{calculate_empty_spaces_at_start, check_for_multi_comment, check_for_single_line_comment, split_into_normal_and_comment_part};
 use std::cmp::max;
 
 pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -79,7 +79,7 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
     let mut new_lines: Vec<String> = Vec::new();
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -150,7 +150,7 @@ pub fn remove_empty_space_on_end_of_line(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -174,7 +174,7 @@ pub fn move_single_open_bracket(lines: Vec<String>) -> Vec<String> {
     let mut new_lines: Vec<String> = Vec::new();
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -218,7 +218,7 @@ pub fn remove_empty_line_before_close_bracket(lines: Vec<String>) -> Vec<String>
     let mut new_lines: Vec<String> = Vec::new();
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -235,7 +235,7 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
     let mut find_oneliner = false;
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -267,7 +267,7 @@ pub fn connect_end_lines(lines: Vec<String>) -> Vec<String> {
     let mut next_line_with_addition = false;
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -294,7 +294,7 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
     let mut current_case_line = 0;
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -333,7 +333,7 @@ pub fn space_before_bracket(lines: Vec<String>) -> Vec<String> {
     let quote_char: Option<char> = None; // if some, then means that string started, allowed values '`"
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
@@ -368,7 +368,7 @@ pub fn reorganize_space_in_models(lines: Vec<String>) -> Vec<String> {
     let mut model_bracket_start_position: Option<usize> = None;
     let mut multi_comment = false;
     for line in lines {
-        if check_for_multi_comment(&line, &mut multi_comment) {
+        if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
             new_lines.push(line);
             continue;
         }
