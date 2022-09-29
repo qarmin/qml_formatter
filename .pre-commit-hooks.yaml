@@ -1,0 +1,6 @@
+- id: qml_formatter
+  name: reformat QML files
+  description: Automatic code formatter for QML files.
+  entry: qml_formatter NO_QUESTION
+  language: rust
+  types: [qml]
