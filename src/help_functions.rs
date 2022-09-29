@@ -63,7 +63,7 @@ pub fn calculate_empty_spaces_at_start(line: &str) -> i32 {
             break;
         }
     }
-    return counter;
+    counter
 }
 
 pub fn split_into_normal_and_comment_part(line: &str) -> (String, String) {
@@ -108,7 +108,7 @@ pub fn split_into_normal_and_comment_part(line: &str) -> (String, String) {
         }
     }
 
-    return (normal_text, comment_part);
+    (normal_text, comment_part)
 }
 
 pub fn check_for_multi_comment(line: &str, is_comment: &mut bool) -> bool {

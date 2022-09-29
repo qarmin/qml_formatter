@@ -255,7 +255,9 @@ states: [
             "20_multi_line_models",
             "21_switch_case",
             "22_regular_expression",
-            "23_connect_at_end_line","24_ignore_comments",
+            "23_connect_at_end_line",
+            "24_ignore_comments",
+            "25_multiple_question_mark",
             "example",
         ];
         for test_name in tests {

@@ -32,7 +32,7 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
                                 collected_chars.push(' ');
                             }
                         } else if charr == '?' {
-                            if collected_chars.last() != Some(&' ') {
+                            if ![Some(&'?'), Some(&' ')].contains(&collected_chars.last()) {
                                 collected_chars.push(' ');
                                 collected_chars.push(charr);
                                 collected_chars.push(' ');
@@ -311,7 +311,7 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
         }
 
         let line_trimmed = line.trim();
-        if line_trimmed.starts_with("case ") && line_trimmed.ends_with(":") {
+        if line_trimmed.starts_with("case ") && line_trimmed.ends_with(':') {
             case_started = true;
             current_case_line = 0
         } else {
