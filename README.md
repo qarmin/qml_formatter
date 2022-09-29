@@ -77,3 +77,35 @@ Text {
 - support for Javascript/HTML/C++ comments
 - switch/case
 - better multi-line support
+
+# Limitations
+## Multiline for/if/else without {}
+```
+for(abcd)
+    if(abcd)
+        DBCC()
+```
+will be formatted into
+```
+for(abcd)
+    if(abcd)
+    DBCC()
+```
+as workaround use always brackets, which are fully supported
+```
+for(abcd) {
+    if(abcd) {
+        DBCC()
+    }
+}
+```
+it works fine with simple oneliners
+```
+for(ABCD)
+BCDF()
+```
+will become
+```
+for(ABCD)
+    BCDF()
+```

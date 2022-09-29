@@ -311,7 +311,7 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
         }
 
         let line_trimmed = line.trim();
-        if line_trimmed.starts_with("case ") && line_trimmed.ends_with(':') {
+        if (line_trimmed.starts_with("case ") || line_trimmed.starts_with("default:")) && line_trimmed.ends_with(':') {
             case_started = true;
             current_case_line = 0
         } else {

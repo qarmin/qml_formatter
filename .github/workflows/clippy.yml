@@ -1,4 +1,4 @@
-name: 🐧 Linux
+name: 🐧 Linux Clippy
 on:
   push:
   pull_request:

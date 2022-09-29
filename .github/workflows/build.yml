@@ -1,4 +1,4 @@
-name: 🐧 Linux
+name: 🐧 Linux Build
 on:
   push:
   pull_request:
@@ -38,5 +38,5 @@ jobs:
       - name: Store Linux
         uses: actions/upload-artifact@v2
         with:
-          name: thorvg_tester-${{ runner.os }}-${{ matrix.toolchain }}
+          name: qml_formatter-${{ runner.os }}-${{ matrix.toolchain }}
           path: target/release/qml_formatter
