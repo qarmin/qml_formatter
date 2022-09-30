@@ -36,6 +36,9 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
                                 collected_chars.push(' ');
                                 collected_chars.push(charr);
                                 collected_chars.push(' ');
+                            } else if collected_chars.last() == Some(&'?') {
+                                collected_chars.push(charr);
+                                collected_chars.push(' ');
                             } else {
                                 collected_chars.push(charr);
                             }
