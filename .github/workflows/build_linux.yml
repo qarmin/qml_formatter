@@ -14,14 +14,14 @@ jobs:
         type: [ release ]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.toolchain }}
           override: true
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             target
@@ -36,7 +36,17 @@ jobs:
           RUSTFLAGS: "-C debuginfo=0"
 
       - name: Store Linux
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: qml_formatter-${{ runner.os }}-${{ matrix.toolchain }}
           path: target/release/qml_formatter
+          
+      - name: Automatic pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          title: "Nightly builds"
+          automatic_release_tag: "latest"
+          files: |
+            target/release/qml_formatter
