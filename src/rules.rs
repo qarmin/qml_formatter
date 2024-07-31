@@ -118,7 +118,15 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
         let mut count_close_round_bracket = 0;
         let mut count_close_bracket = 0;
         let mut count_close_square_bracket = 0;
+        let mut string_interpolation = false;
         for charr in line.chars() {
+            if charr == '`' {
+                string_interpolation = !string_interpolation;
+                continue;
+            }
+            else if string_interpolation {
+                continue;
+            }
             if charr == '{' {
                 count_open_bracket += 1;
             } else if charr == '}' {
@@ -144,6 +152,9 @@ pub fn move_elements_inside(lines: Vec<String>) -> Vec<String> {
             } else {
                 current_bracket_number -= calculated_ending_brackets;
             }
+        }
+        if string_interpolation {
+            println!("Unclosed template literal, probably QML is broken");
         }
     }
     new_lines
