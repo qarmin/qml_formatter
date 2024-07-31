@@ -43,7 +43,8 @@ use std::fs::read_to_string;
             fn test_{test_name}() {{
                 let input_content = read_to_string("{input_file}").unwrap();
                 let output_content = read_to_string("{output_file}").unwrap();
-                assert_eq!(convert_file(input_content), output_content);
+                let result_content = convert_file(input_content);
+                assert_eq!(result_content, output_content);
             }}
             "#,
             test_name = test_name,
