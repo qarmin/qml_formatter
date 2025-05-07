@@ -18,7 +18,7 @@ jobs:
           cargo build --release
 
       - name: Store Linux
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: qml_formatter-${{ runner.os }}-${{ matrix.toolchain }}
           path: target/release/qml_formatter
