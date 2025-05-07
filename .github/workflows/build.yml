@@ -25,7 +25,6 @@ jobs:
           # Cross-compile for Windows
           rustup target add x86_64-pc-windows-gnu
           cargo build --target x86_64-pc-windows-gnu --release
-          tree
           mv target/x86_64-pc-windows-gnu/release/qml_formatter.exe windows_qml_formatter.exe
 
       - name: Store Linux
