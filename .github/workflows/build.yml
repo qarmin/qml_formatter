@@ -1,0 +1,51 @@
+name: 🐧 Linux Build
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mingw
+        run: |
+          sudo apt-get update && sudo apt-get install -y mingw-w64 tree
+
+      - name: Build Release
+        run: |
+          rustup default stable
+          cargo build --release
+          mv target/release/qml_formatter linux_qml_formatter
+          
+          # Cross-compile for Windows
+          rustup target add x86_64-pc-windows-gnu
+          cargo build --target x86_64-pc-windows-gnu --release
+          mv target/x86_64-pc-windows-gnu/release/qml_formatter.exe windows_qml_formatter.exe
+
+      - name: Store Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: qml_formatter-linux
+          path: linux_qml_formatter
+
+      - name: Store Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: qml_formatter-windows
+          path: windows_qml_formatter.exe
+
+      - name: Automatic pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          title: "Nightly builds"
+          automatic_release_tag: "latest"
+          files: |
+            linux_qml_formatter
+            windows_qml_formatter.exe
