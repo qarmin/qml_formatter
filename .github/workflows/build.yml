@@ -31,13 +31,13 @@ jobs:
       - name: Store Linux
         uses: actions/upload-artifact@v4
         with:
-          name: qml_formatter-${{ runner.os }}
+          name: qml_formatter-linux
           path: linux_qml_formatter
 
       - name: Store Windows
         uses: actions/upload-artifact@v4
         with:
-          name: qml_formatter-${{ runner.os }}
+          name: qml_formatter-windows
           path: windows_qml_formatter.exe
 
       - name: Automatic pre-release
