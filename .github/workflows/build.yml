@@ -14,7 +14,7 @@ jobs:
 
       - name: Install mingw
         run: |
-          sudo apt-get update && sudo apt-get install -y mingw-w64
+          sudo apt-get update && sudo apt-get install -y mingw-w64 tree
 
       - name: Build Release
         run: |
@@ -25,7 +25,8 @@ jobs:
           # Cross-compile for Windows
           rustup target add x86_64-pc-windows-gnu
           cargo build --target x86_64-pc-windows-gnu --release
-          mv target/x86_64-pc-windows-gnu/release/qml_formatter windows_qml_formatter.exe
+          tree
+          mv target/x86_64-pc-windows-gnu/release/qml_formatter.exe windows_qml_formatter.exe
 
       - name: Store Linux
         uses: actions/upload-artifact@v4
