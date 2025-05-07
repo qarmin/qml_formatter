@@ -42,6 +42,21 @@ pub fn remove_useless_spaces_around_colon(lines: Vec<String>) -> Vec<String> {
                             } else {
                                 collected_chars.push(charr);
                             }
+                        } else if charr == '.' {
+                            let mut chain: Option<char> = None;
+                            if collected_chars.last() == Some(&' ') {
+                                collected_chars.pop();
+                            }
+                            if [Some(&'?'), Some(&'!')].contains(&collected_chars.last()) {
+                                chain = collected_chars.pop();
+                            }
+                            if collected_chars.last() == Some(&' ') {
+                                collected_chars.pop();
+                            }
+                            if let Some(chain) = chain {
+                                collected_chars.push(chain);
+                            }
+                            collected_chars.push(charr);
                         } else if charr == ':' {
                             if collected_chars.contains(&'?') {
                                 if collected_chars.last() != Some(&' ') {
