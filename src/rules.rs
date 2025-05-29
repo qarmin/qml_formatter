@@ -293,7 +293,7 @@ pub fn if_movement(lines: Vec<String>) -> Vec<String> {
 
 pub fn connect_end_lines(lines: Vec<String>) -> Vec<String> {
     let mut new_lines = Vec::new();
-    let mut next_line_with_addition = false;
+    let mut next_line_with_addition: Option<char> = None;
     let mut multi_comment = false;
     for line in lines {
         if check_for_multi_comment(&line, &mut multi_comment) || check_for_single_line_comment(&line) {
@@ -303,13 +303,13 @@ pub fn connect_end_lines(lines: Vec<String>) -> Vec<String> {
         let (line, comments) = split_into_normal_and_comment_part(&line);
         let mut spaces = "".to_string();
 
-        if next_line_with_addition {
-            next_line_with_addition = false;
+        if next_line_with_addition.is_some() && !line.ends_with(next_line_with_addition.unwrap()) {
+            next_line_with_addition = None;
             spaces = "    ".to_string();
         }
 
         if ["+", "-", ":", "?"].iter().any(|e| line.ends_with(e)) {
-            next_line_with_addition = true;
+            next_line_with_addition = Some(line.chars().last().unwrap());
         }
 
         new_lines.push(format!("{}{}{}", spaces, line, comments));
@@ -328,8 +328,9 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
             continue;
         }
         let mut new_line = "".to_string();
+        let line_trimmed = line.trim();
 
-        if case_started {
+        if case_started && !line_trimmed.starts_with("case "){
             current_case_line += 1;
         }
 
@@ -339,7 +340,6 @@ pub fn switch_case(lines: Vec<String>) -> Vec<String> {
             continue;
         }
 
-        let line_trimmed = line.trim();
         if (line_trimmed.starts_with("case ") || line_trimmed.starts_with("default:")) && line_trimmed.ends_with(':') {
             case_started = true;
             current_case_line = 0
